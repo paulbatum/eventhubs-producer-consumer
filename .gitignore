@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Consumer/Properties/launchSettings.json
+/Producer/Properties/launchSettings.json
+/Consumer/run.cmd
+/Consumer/run.sh
+/Producer/run.cmd
