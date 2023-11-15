@@ -1,6 +1,9 @@
-﻿using Azure.Messaging.EventHubs.Consumer;
+﻿using System.Diagnostics.Tracing;
+using Azure.Core.Diagnostics;
+using Azure.Messaging.EventHubs.Consumer;
 using Azure.Messaging.EventHubs.Primitives;
 using Azure.Storage.Blobs;
+using Microsoft.Azure.Amqp;
 
 namespace Consumer
 {
@@ -27,6 +30,46 @@ namespace Consumer
             var storageClient = new BlobContainerClient(storageConnectionString, blobContainerName);
             var checkpointStore = new BlobCheckpointStore(storageClient);
             var options = new EventProcessorOptions { PrefetchCount = prefetchCount };
+
+            AmqpTrace.FrameLogger = s =>
+            {
+                //Console.WriteLine(s);
+
+                //if (s.Contains("SEND FRM"))
+                //{
+
+                //}
+            };
+
+            using var logFile = File.OpenWrite($"log-{DateTime.Now:yyyyMMdd-HHmmss}.txt");
+            using var logWriter = new StreamWriter(logFile);
+            using AzureEventSourceListener customListener = new AzureEventSourceListener((args, message) =>
+            {
+                if (args.Level == EventLevel.Error || args.Level == EventLevel.Warning)
+                {
+                    Console.WriteLine(message);
+                    logWriter.WriteLine(message);
+                }
+                else if (args.EventSource.Name.StartsWith("Azure-Messaging-EventHubs"))
+                {
+                    switch (args.EventId)
+                    {
+                        case 6:
+                        case 7:
+                        case 56:
+                        case 57:
+                        case 62:
+                        case 63:
+                            logWriter.WriteLine(message);
+                            //Console.WriteLine(message);
+                            break;
+                    }
+                }
+            }, EventLevel.LogAlways);
+
+            Console.WriteLine($"Writing logs to {logFile.Name}");
+
+            //using AzureEventSourceListener listener = AzureEventSourceListener.CreateConsoleLogger();
 
             var processor = new SimpleBatchProcessor(
                 checkpointStore,

@@ -72,6 +72,9 @@ namespace Consumer
                 Interlocked.Add(ref _totalBytesProcessed, localByteCount);
                 Interlocked.Add(ref _totalEventsProcessed, localEventCount);
 
+                //Console.WriteLine($"Got {localEventCount} messages. Hit any key to process batch");
+                //Console.ReadKey();
+
                 // Create a checkpoint based on the last event in the batch.
                 var lastEvent = events.Last();
 

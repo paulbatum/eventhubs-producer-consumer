@@ -1,0 +1,25 @@
+{
+    "version": "2.0",
+  "logging": {
+    "logLevel": {
+      "default": "Error",
+      "Function.Function1.User": "Information"
+    },
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      },
+      "enableLiveMetricsFilters": true
+    }
+  },
+  "extensions": {
+    "eventHubs": {
+      "batchCheckpointFrequency": 1,
+      "eventProcessorOptions": {
+        "maxBatchSize": 2500,
+        "prefetchCount": 5000
+      }
+    }
+  }
+}
